@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111210">
+  <title>{% block title %}Sazón Express{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-sazon-express.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='portales.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='liquid-glass.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('inicio') }}" aria-label="Sazón Express, inicio">
+        <span class="brand-mark"><img src="{{ url_for('static', filename='logo-sazon-express.png') }}" alt="Sazón Express"></span>
+        <span class="brand-copy">Sazón<span>Express</span><small>RESTAURANTE · DELIVERY</small></span>
+      </a>
+      <div class="nav-caption">MENÚ PRINCIPAL</div>
+      <nav class="side-nav" aria-label="Navegación principal">
+        <a class="nav-link {% if request.endpoint == 'inicio' %}active{% endif %}" href="{{ url_for('inicio') }}"><span class="nav-icon">⌂</span>Inicio</a>
+        <a class="nav-link {% if request.endpoint in ['nuevo_pedido', 'consumidores'] %}active{% endif %}" href="{{ url_for('consumidores') }}"><span class="nav-icon">＋</span>Consumidores</a>
+        <a class="nav-link {% if request.endpoint == 'trabajadores' %}active{% endif %}" href="{{ url_for('trabajadores') }}"><span class="nav-icon">♨</span>Trabajadores</a>
+        <a class="nav-link {% if request.endpoint == 'pedidos' %}active{% endif %}" href="{{ url_for('pedidos') }}"><span class="nav-icon">▤</span>Pedidos</a>
+        <a class="nav-link {% if request.endpoint == 'estadisticas' %}active{% endif %}" href="{{ url_for('estadisticas') }}"><span class="nav-icon">▥</span>Estadísticas</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="open-status"><span></span><div><strong>Servicio activo</strong><small>Pedidos disponibles</small></div></div>
+        <div class="sidebar-footer">SAZÓN EXPRESS <span>·</span> PANEL DE ADMINISTRACIÓN</div>
+      </div>
+    </aside>
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-label"><span class="topbar-dot"></span> OPERACIÓN EN TIEMPO REAL</div>
+        <a class="topbar-order" href="{{ url_for('consumidores') }}"><span>＋</span> Hacer pedido</a>
+      </header>
+      <main class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="toast-stack" role="status" aria-live="polite">
+              {% for category, message in messages %}
+                <div class="toast toast-{{ category }}"><span class="toast-symbol">{% if category == 'success' %}✓{% else %}!{% endif %}</span>{{ message }}<button type="button" class="toast-close" aria-label="Cerrar notificación">×</button></div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="app-footer">Sazón Express <span>·</span> Gestión de pedidos hecha con cuidado.</footer>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

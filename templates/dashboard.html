@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Inicio | Sazón Express{% endblock %}
+{% block content %}
+<section class="welcome-row">
+  <div><div class="eyebrow"><span class="eyebrow-mark">✦</span> TU RESTAURANTE, EN UN SOLO LUGAR</div><h1>¡Hola! <span>Buen día.</span></h1><p>Así va Sazón Express. Aquí tienes el resumen de hoy.</p></div>
+  <div class="date-chip"><span>◷</span>{{ fecha_actual }}</div>
+</section>
+<section class="metric-strip dashboard-metrics">
+  <article class="metric-card"><span class="metric-icon orange-icon">▤</span><div><small>TOTAL DE PEDIDOS</small><strong>{{ resumen.pedidos }}</strong></div><span class="metric-caption">en el sistema</span></article>
+  <article class="metric-card"><span class="metric-icon amber-icon">◷</span><div><small>PENDIENTES</small><strong>{{ resumen.pendientes }}</strong></div><span class="metric-caption">por preparar</span></article>
+  <article class="metric-card"><span class="metric-icon green-icon">✓</span><div><small>ENTREGADOS</small><strong>{{ resumen.entregados }}</strong></div><span class="metric-caption">órdenes completadas</span></article>
+  <article class="metric-card"><span class="metric-icon red-icon">$</span><div><small>VENTAS ACTIVAS</small><strong>${{ "%.2f"|format(resumen.ventas) }}</strong></div><span class="metric-caption">sin cancelaciones</span></article>
+</section>
+<section class="charts-grid">
+  <article class="surface chart-card"><div class="chart-heading"><div><span class="section-kicker">ÚLTIMOS 7 DÍAS</span><h2>Ritmo de pedidos</h2></div><span class="chart-legend"><i></i> Pedidos</span></div><div class="chart-holder"><canvas class="data-chart" data-chart="{{ actividad|tojson|forceescape }}" data-series="pedidos" aria-label="Gráfica de pedidos de los últimos siete días"></canvas></div></article>
+  <article class="surface chart-card"><div class="chart-heading"><div><span class="section-kicker">ÚLTIMOS 7 DÍAS</span><h2>Ventas por día</h2></div><span class="chart-legend legend-sales"><i></i> Ventas</span></div><div class="chart-holder"><canvas class="data-chart" data-chart="{{ actividad|tojson|forceescape }}" data-series="ventas" data-currency="true" aria-label="Gráfica de ventas de los últimos siete días"></canvas></div></article>
+</section>
+<section class="surface recent-surface">
+  <div class="orders-heading"><div><span class="section-kicker">ACTIVIDAD RECIENTE</span><h2>Últimos pedidos</h2></div><a class="text-link" href="{{ url_for('pedidos') }}">Ver todos <span>→</span></a></div>
+  {% if recientes %}<div class="recent-list">{% for p in recientes %}<a class="recent-row" href="{{ url_for('pedidos') }}"><span class="recent-food">{% if 'Hamburguesa' in p.producto %}🍔{% elif 'Pizza' in p.producto %}🍕{% elif 'Tacos' in p.producto %}🌮{% elif 'Ensalada' in p.producto %}🥗{% elif 'Papas' in p.producto %}🍟{% else %}🍱{% endif %}</span><span class="recent-detail"><strong>{{ p.cliente }}</strong><small>{{ p.cantidad }} × {{ p.producto }} · #{{ "%04d"|format(p.id) }}</small></span><span class="status-badge status-{{ p.estado|lower }}">{{ p.estado }}</span><strong class="recent-total">${{ "%.2f"|format(p.total) }}</strong></a>{% endfor %}</div>
+  {% else %}<div class="empty-state dashboard-empty"><span class="empty-illustration">🍽️</span><h3>Tu próxima orden empieza aquí</h3><p>Cuando registres el primer pedido, podrás ver su actividad en este panel.</p><a class="text-link" href="{{ url_for('consumidores') }}">Crear nuevo pedido →</a></div>{% endif %}
+</section>
+{% endblock %}

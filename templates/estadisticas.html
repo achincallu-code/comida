@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Estadísticas | Sazón Express{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><div class="eyebrow"><span class="eyebrow-mark">✦</span> DATOS PARA DECIDIR MEJOR</div><h1>Tu negocio, <span>en números.</span></h1><p>Actividad de pedidos y ventas basada en los registros de Sazón Express.</p></div></section>
+<section class="metric-strip dashboard-metrics">
+  <article class="metric-card"><span class="metric-icon orange-icon">▤</span><div><small>TOTAL DE PEDIDOS</small><strong>{{ resumen.pedidos }}</strong></div><span class="metric-caption">histórico completo</span></article>
+  <article class="metric-card"><span class="metric-icon red-icon">$</span><div><small>VENTAS NO CANCELADAS</small><strong>${{ "%.2f"|format(resumen.ventas) }}</strong></div><span class="metric-caption">ingreso acumulado</span></article>
+  <article class="metric-card"><span class="metric-icon amber-icon">◷</span><div><small>PENDIENTES</small><strong>{{ resumen.pendientes }}</strong></div><span class="metric-caption">requieren atención</span></article>
+  <article class="metric-card"><span class="metric-icon green-icon">✓</span><div><small>ENTREGADOS</small><strong>{{ resumen.entregados }}</strong></div><span class="metric-caption">órdenes completadas</span></article>
+</section>
+<section class="surface stats-chart-card"><div class="chart-heading"><div><span class="section-kicker">TENDENCIA RECIENTE</span><h2>Pedidos y ventas · últimos 14 días</h2></div><div class="chart-legends"><span class="chart-legend"><i></i> Pedidos</span><span class="chart-legend legend-sales"><i></i> Ventas</span></div></div><div class="charts-grid"><div class="chart-holder tall-chart"><canvas class="data-chart" data-chart="{{ actividad|tojson|forceescape }}" data-series="pedidos" aria-label="Gráfica de pedidos recientes"></canvas></div><div class="chart-holder tall-chart"><canvas class="data-chart" data-chart="{{ actividad|tojson|forceescape }}" data-series="ventas" data-currency="true" aria-label="Gráfica de ventas recientes"></canvas></div></div></section>
+<section class="surface recent-surface stats-recent">
+  <div class="orders-heading"><div><span class="section-kicker">LO MÁS RECIENTE</span><h2>Actividad de pedidos</h2></div><a class="text-link" href="{{ url_for('pedidos') }}">Administrar pedidos <span>→</span></a></div>
+  {% if recientes %}<div class="recent-list">{% for p in recientes %}<a class="recent-row" href="{{ url_for('pedidos') }}"><span class="recent-food">{% if 'Hamburguesa' in p.producto %}🍔{% elif 'Pizza' in p.producto %}🍕{% elif 'Tacos' in p.producto %}🌮{% elif 'Ensalada' in p.producto %}🥗{% elif 'Papas' in p.producto %}🍟{% else %}🍱{% endif %}</span><span class="recent-detail"><strong>{{ p.cliente }}</strong><small>{{ p.producto }} · #{{ "%04d"|format(p.id) }}</small></span><span class="status-badge status-{{ p.estado|lower }}">{{ p.estado }}</span><strong class="recent-total">${{ "%.2f"|format(p.total) }}</strong></a>{% endfor %}</div>
+  {% else %}<div class="empty-state dashboard-empty"><span class="empty-illustration">📈</span><h3>Las estadísticas se llenan con cada pedido</h3><p>Registra órdenes y aquí verás la evolución real de tu actividad.</p><a class="text-link" href="{{ url_for('consumidores') }}">Crear nuevo pedido →</a></div>{% endif %}
+</section>
+{% endblock %}

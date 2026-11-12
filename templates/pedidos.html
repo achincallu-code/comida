@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Pedidos | Sazón Express{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+  <div><div class="eyebrow"><span class="eyebrow-mark">✦</span> CENTRO DE OPERACIONES</div><h1>Todos los <span>pedidos.</span></h1><p>Un vistazo a cada orden, desde la cocina hasta la entrega.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('consumidores') }}"><b>＋</b> Nuevo pedido</a>
+</section>
+<div class="metric-strip">
+  <article class="metric-card"><span class="metric-icon orange-icon">▤</span><div><small>ÓRDENES REGISTRADAS</small><strong>{{ total }}</strong></div><span class="metric-caption">histórico completo</span></article>
+  <article class="metric-card"><span class="metric-icon green-icon">$</span><div><small>VENTAS NO CANCELADAS</small><strong>${{ "%.2f"|format(ventas) }}</strong></div><span class="metric-caption">ingreso acumulado</span></article>
+</div>
+<section class="surface orders-surface">
+  <div class="orders-heading"><div><span class="section-kicker">SEGUIMIENTO EN VIVO</span><h2>Listado de pedidos <span class="result-count">{{ registros|length }}</span></h2></div></div>
+  <form class="filter-bar" method="GET" action="{{ url_for('pedidos') }}">
+    <label class="search-box"><span>⌕</span><input name="q" placeholder="Buscar cliente, platillo o teléfono" value="{{ busqueda }}" aria-label="Buscar pedidos"><button type="submit" class="search-submit" aria-label="Buscar">→</button></label>
+    <label class="filter-select"><span>Estado</span><select name="estado"><option value="">Todos los estados</option>{% for opcion in estados %}<option value="{{ opcion }}" {% if estado == opcion %}selected{% endif %}>{{ opcion }}</option>{% endfor %}</select></label>
+    <button class="btn btn-filter" type="submit">Aplicar filtros</button>
+    {% if busqueda or estado %}<a class="clear-filters" href="{{ url_for('pedidos') }}">Limpiar</a>{% endif %}
+  </form>
+  {% if registros %}
+  <div class="table-wrap"><table class="orders-table"><thead><tr><th>PEDIDO</th><th>CLIENTE</th><th>PLATILLO</th><th>ENTREGA</th><th>TOTAL</th><th>ESTADO Y ACCIONES</th></tr></thead><tbody>
+    {% for p in registros %}
+    <tr>
+      <td><span class="order-number">#{{ "%04d"|format(p.id) }}</span><small>{{ p.fecha }}</small></td>
+      <td><strong class="customer-name">{{ p.cliente }}</strong><small>{{ p.telefono }}</small></td>
+      <td><strong class="product-name">{{ p.producto }}</strong><small>{{ p.cantidad }} × ${{ "%.2f"|format(p.total / p.cantidad) }}{% if p.notas %} · {{ p.notas }}{% endif %}</small></td>
+      <td><span class="delivery-pill">{{ p.entrega }}</span></td>
+      <td><strong class="table-total">${{ "%.2f"|format(p.total) }}</strong></td>
+      <td class="actions-cell">
+        <form class="status-form" method="POST" action="{{ url_for('cambiar_estado', pedido_id=p.id) }}">
+          <input type="hidden" name="q" value="{{ busqueda }}"><input type="hidden" name="filtro_estado" value="{{ estado }}">
+          <select name="estado" class="status-select status-{{ p.estado|lower }}" aria-label="Estado del pedido {{ p.id }}">{% for opcion in estados %}<option value="{{ opcion }}" {% if p.estado == opcion %}selected{% endif %}>{{ opcion }}</option>{% endfor %}</select>
+          <button type="submit" class="update-button" aria-label="Guardar estado del pedido {{ p.id }}">Guardar</button>
+        </form>
+        <form method="POST" action="{{ url_for('eliminar', pedido_id=p.id) }}" data-confirm="¿Eliminar permanentemente el pedido #{{ p.id }}?">
+          <input type="hidden" name="q" value="{{ busqueda }}"><input type="hidden" name="filtro_estado" value="{{ estado }}">
+          <button type="submit" class="delete-button">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}
+  <div class="empty-state"><span class="empty-illustration">🍽️</span><span class="section-kicker">{% if busqueda or estado %}SIN COINCIDENCIAS{% else %}LA MESA ESTÁ LISTA{% endif %}</span><h3>{% if busqueda or estado %}No encontramos esos pedidos{% else %}Todavía no hay pedidos{% endif %}</h3><p>{% if busqueda or estado %}Prueba con otros términos o cambia el filtro de estado.{% else %}Cuando registres una orden, su seguimiento aparecerá aquí.{% endif %}</p>{% if busqueda or estado %}<a class="text-link" href="{{ url_for('pedidos') }}">Ver todos los pedidos →</a>{% else %}<a class="text-link" href="{{ url_for('consumidores') }}">Crear primer pedido →</a>{% endif %}</div>
+  {% endif %}
+</section>
+{% endblock %}

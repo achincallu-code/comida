@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Pide aquí | Sazón Express{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><div class="eyebrow"><span class="eyebrow-mark">✦</span> PARA QUIENES AMAN COMER RICO</div><h1>Tu antojo <span>va primero.</span></h1><p>Elige algo delicioso, cuéntanos cómo te llamas y preparamos tu pedido.</p></div>
+  <a class="back-link" href="{{ url_for('trabajadores') }}">¿Trabajas aquí? <span>Ir a cocina →</span></a>
+</section>
+<div class="order-layout">
+  <section class="surface order-surface">
+    <div class="surface-heading"><div><span class="section-kicker">01 — DETALLES</span><h2>Arma tu pedido</h2></div><span class="secure-note"><span>●</span> Cálculo seguro</span></div>
+    <form method="POST" action="{{ url_for(request.endpoint) }}" id="orderForm">
+      <div class="form-grid">
+        <label class="field">Nombre del cliente<input name="cliente" placeholder="Ej. María García" value="{{ datos.get('cliente','') }}" autocomplete="name" required minlength="3"><span class="field-icon">♙</span></label>
+        <label class="field">Teléfono de contacto<input name="telefono" placeholder="10 dígitos" value="{{ datos.get('telefono','') }}" maxlength="10" inputmode="numeric" autocomplete="tel" required><span class="field-icon">⌕</span></label>
+      </div>
+      <div class="menu-heading"><div><span class="section-kicker">02 — EL MENÚ</span><h3>¿Qué se te antoja?</h3></div><span class="menu-count">{{ menu|length }} favoritos</span></div>
+      <div class="menu-grid">
+        {% for nombre, precio in menu.items() %}
+        <label class="menu-card">
+          <input type="radio" name="producto" value="{{ nombre }}" data-price="{{ precio }}" {% if datos.get('producto') == nombre %}checked{% endif %} required>
+          <span class="dish-art dish-{{ loop.index }}"><span class="dish-emoji">{% if 'Hamburguesa' in nombre %}🍔{% elif 'Pizza' in nombre %}🍕{% elif 'Tacos' in nombre %}🌮{% elif 'Ensalada' in nombre %}🥗{% elif 'Papas' in nombre %}🍟{% else %}🍱{% endif %}</span><span class="dish-plus">+</span></span>
+          <span class="dish-info"><strong>{{ nombre }}</strong><small>{% if 'Hamburguesa' in nombre %}Clásica, jugosa y recién hecha{% elif 'Pizza' in nombre %}Horneada al momento{% elif 'Tacos' in nombre %}Con todo el sabor de casa{% elif 'Ensalada' in nombre %}Fresca y llena de color{% elif 'Papas' in nombre %}Doraditas y crujientes{% else %}Una combinación irresistible{% endif %}</small><b>${{ "%.2f"|format(precio) }}</b></span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="form-grid order-options">
+        <label class="field">Cantidad<select name="cantidad" id="cantidad">{% for n in range(1,11) %}<option value="{{ n }}" {% if datos.get('cantidad','1')|int == n %}selected{% endif %}>{{ n }} {% if n == 1 %}unidad{% else %}unidades{% endif %}</option>{% endfor %}</select></label>
+        <label class="field">Tipo de entrega<select name="entrega" id="entrega" required><option value="">Selecciona una opción</option>{% for opcion in entregas %}<option value="{{ opcion }}" {% if datos.get('entrega') == opcion %}selected{% endif %}>{{ opcion }}</option>{% endfor %}</select></label>
+      </div>
+      <label class="field notes-field">Notas especiales <span class="optional">(opcional)</span><textarea name="notas" rows="3" placeholder="¿Alguna indicación para la cocina o entrega?">{{ datos.get('notas','') }}</textarea></label>
+      <div class="mobile-total"><span>Total estimado</span><strong id="mobile-total">$0.00</strong></div>
+      <div class="submit-row"><span class="server-note"><span>✓</span> Total validado en el servidor</span><button class="btn btn-primary submit-button" type="submit"><span>Confirmar pedido</span><b>→</b></button></div>
+    </form>
+  </section>
+  <aside class="order-aside">
+    <div class="preview-card">
+      <div class="preview-top"><span class="preview-label">RESUMEN DE TU ORDEN</span><span class="preview-spark">✦</span></div>
+      <div class="preview-image"><span id="preview-emoji">🍽️</span><small>FRESCO, HECHO AL MOMENTO</small></div>
+      <div class="preview-dish"><small>SELECCIÓN</small><strong id="preview-product">Elige un platillo</strong></div>
+      <div class="preview-line"><span>Cliente</span><strong id="preview-client">A nombre de...</strong></div>
+      <div class="preview-line"><span>Cantidad</span><strong id="preview-quantity">1 unidad</strong></div>
+      <div class="preview-line"><span>Entrega</span><strong id="preview-delivery">Por definir</strong></div>
+      <div class="preview-total"><span>Total estimado</span><strong id="total">$0.00</strong></div>
+      <p class="preview-disclaimer">El precio final se calcula y verifica al confirmar el pedido.</p>
+    </div>
+    <div class="promise-card"><span class="promise-icon">✦</span><div><strong>Hecho para disfrutar</strong><p>Tu orden queda registrada y el equipo la recibe en su pantalla de cocina.</p></div></div>
+  </aside>
+</div>
+{% endblock %}
