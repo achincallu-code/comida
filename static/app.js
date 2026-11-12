@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         context.moveTo(left, y);
         context.lineTo(right, y);
         context.stroke();
-        context.fillStyle = "#777a72";
+        context.fillStyle = "#c3c5bd";
         context.fillText(
           isCurrency ? `$${Math.round(value)}` : String(Math.round(value)),
           left - 7,
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
         context.stroke();
         const showLabel = labels.length <= 8 || index % 2 === 0 || index === labels.length - 1;
         if (showLabel) {
-          context.fillStyle = "#82847c";
+          context.fillStyle = "#c3c5bd";
           context.font = "8px DM Sans, Arial, sans-serif";
           context.textAlign = index === 0 ? "left" : index === labels.length - 1 ? "right" : "center";
           context.textBaseline = "top";
