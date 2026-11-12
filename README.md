@@ -41,7 +41,9 @@ La aplicación utiliza `pedidos.db` en esta carpeta cuando `DATABASE_URL` no est
 1. Crea una base de datos/proyecto en Neon y copia su cadena de conexión PostgreSQL. Mantén su configuración SSL y no la publiques en el repositorio.
 2. Sube este proyecto a un repositorio Git y crea un Web Service en Render conectándolo a ese repositorio. Render puede detectar la configuración de `render.yaml`.
 3. En las variables de entorno del servicio de Render, configura `DATABASE_URL` con la URL de Neon. Render genera `SECRET_KEY`; conserva `FLASK_DEBUG=false`.
-4. Render instala las dependencias, crea la tabla con `CREATE TABLE IF NOT EXISTS` y arranca Gunicorn. `/health` está configurado como health check.
+4. Render instala las dependencias, crea la tabla con `CREATE TABLE IF NOT EXISTS` y arranca Gunicorn. La creación reintenta hasta cuatro veces ante desconexiones transitorias de PostgreSQL. `/health` está configurado como health check.
+
+Si el despliegue falla con `SSL connection has been closed unexpectedly`, verifica en Render que `DATABASE_URL` sea la cadena copiada del proyecto de Neon (incluye `sslmode=require`), que el endpoint/proyecto de Neon esté activo y que el valor se haya guardado sin comillas, espacios ni saltos de línea. No compartas esa cadena en logs públicos ni en chats. El reintento cubre cortes momentáneos durante el arranque; no corrige una URL, contraseña o endpoint incorrectos.
 
 Para conectar desde PowerShell, define las variables antes de ejecutar la app:
 

@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 import os
 from pathlib import Path
 import sqlite3
+import time
 
 import psycopg
 from psycopg.rows import dict_row
@@ -67,21 +68,30 @@ def ejecutar(conn, consulta, parametros=()):
 def crear_tabla():
     id_sql = "BIGSERIAL PRIMARY KEY" if usa_postgresql() else "INTEGER PRIMARY KEY AUTOINCREMENT"
     total_sql = "DOUBLE PRECISION NOT NULL" if usa_postgresql() else "REAL NOT NULL"
-    with conectar() as conn:
-        ejecutar(conn, f"""
-            CREATE TABLE IF NOT EXISTS pedidos (
-                id {id_sql},
-                cliente TEXT NOT NULL,
-                telefono TEXT NOT NULL,
-                producto TEXT NOT NULL,
-                cantidad INTEGER NOT NULL,
-                entrega TEXT NOT NULL,
-                notas TEXT,
-                total {total_sql},
-                estado TEXT DEFAULT 'Pendiente',
-                fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
+    consulta = f"""
+        CREATE TABLE IF NOT EXISTS pedidos (
+            id {id_sql},
+            cliente TEXT NOT NULL,
+            telefono TEXT NOT NULL,
+            producto TEXT NOT NULL,
+            cantidad INTEGER NOT NULL,
+            entrega TEXT NOT NULL,
+            notas TEXT,
+            total {total_sql},
+            estado TEXT DEFAULT 'Pendiente',
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """
+    intentos = 4 if usa_postgresql() else 1
+    for intento in range(intentos):
+        try:
+            with conectar() as conn:
+                ejecutar(conn, consulta)
+            return
+        except psycopg.OperationalError:
+            if intento == intentos - 1:
+                raise
+            time.sleep(2 ** (intento + 1))
 
 
 def obtener_resumen():
